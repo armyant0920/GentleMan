@@ -406,12 +406,18 @@ function applyFilters() {
   });
 
   // Sort
+  function parseDate(s) {
+    if (!s) return 0;
+    const m = s.match(/(\d{2})\.(\d{2})\.(\d{4})\s+(\d{2}):(\d{2}):(\d{2})/);
+    if (!m) return 0;
+    return new Date(+m[3], +m[2]-1, +m[1], +m[4], +m[5], +m[6]).getTime();
+  }
   filtered.sort((a, b) => {
     switch (sortKey) {
-      case "create_desc":  return (b.create_date||"").localeCompare(a.create_date||"");
-      case "create_asc":   return (a.create_date||"").localeCompare(b.create_date||"");
-      case "updated_desc": return (b.last_updated||"").localeCompare(a.last_updated||"");
-      case "updated_asc":  return (a.last_updated||"").localeCompare(b.last_updated||"");
+      case "create_desc":  return parseDate(b.create_date)  - parseDate(a.create_date);
+      case "create_asc":   return parseDate(a.create_date)  - parseDate(b.create_date);
+      case "updated_desc": return parseDate(b.last_updated) - parseDate(a.last_updated);
+      case "updated_asc":  return parseDate(a.last_updated) - parseDate(b.last_updated);
       case "price_asc":    return (parseFloat(a.short_price)||Infinity) - (parseFloat(b.short_price)||Infinity);
       case "price_desc":   return (parseFloat(b.short_price)||0) - (parseFloat(a.short_price)||0);
       case "height_asc":   return (parseFloat(a.height)||0) - (parseFloat(b.height)||0);
